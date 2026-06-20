@@ -1,0 +1,356 @@
+{
+  "metrics": {
+    "random_forest": {
+      "mae": 3203.73,
+      "rmse": 5641.27,
+      "r2": 0.8496,
+      "train_seconds": 12.0,
+      "best_params": {
+        "n_estimators": 15,
+        "max_depth": 20,
+        "min_samples_split": 6,
+        "min_samples_leaf": 1,
+        "max_features": 0.5
+      }
+    },
+    "xgboost": {
+      "mae": 3900.61,
+      "rmse": 6394.24,
+      "r2": 0.8067,
+      "train_seconds": 2.7,
+      "best_params": {
+        "n_estimators": 25,
+        "max_depth": 10,
+        "learning_rate": 0.1894500530685104,
+        "subsample": 0.9090251607892719,
+        "colsample_bytree": 0.7405106945380001,
+        "min_child_weight": 4,
+        "gamma": 0.44645359866940354
+      }
+    }
+  },
+  "cross_validation": {
+    "random_forest": {
+      "n_folds": 5,
+      "r2_mean": 0.84,
+      "r2_std": 0.0036,
+      "mae_mean": 3312.28,
+      "mae_std": 14.94,
+      "rmse_mean": 5809.66,
+      "rmse_std": 77.69
+    },
+    "xgboost": {
+      "n_folds": 5,
+      "r2_mean": 0.8017,
+      "r2_std": 0.0034,
+      "mae_mean": 3936.85,
+      "mae_std": 11.1,
+      "rmse_mean": 6467.47,
+      "rmse_std": 70.58
+    }
+  },
+  "feature_importance": {
+    "random_forest": [
+      {
+        "rank": 1,
+        "feature": "year",
+        "importance": 0.388194,
+        "importance_pct": 38.82
+      },
+      {
+        "rank": 2,
+        "feature": "odometer",
+        "importance": 0.20069,
+        "importance_pct": 20.07
+      },
+      {
+        "rank": 3,
+        "feature": "fuel=diesel",
+        "importance": 0.072395,
+        "importance_pct": 7.24
+      },
+      {
+        "rank": 4,
+        "feature": "drive=fwd",
+        "importance": 0.057252,
+        "importance_pct": 5.73
+      },
+      {
+        "rank": 5,
+        "feature": "fuel=gas",
+        "importance": 0.031161,
+        "importance_pct": 3.12
+      },
+      {
+        "rank": 6,
+        "feature": "drive=4wd",
+        "importance": 0.022243,
+        "importance_pct": 2.22
+      },
+      {
+        "rank": 7,
+        "feature": "transmission=other",
+        "importance": 0.015663,
+        "importance_pct": 1.57
+      },
+      {
+        "rank": 8,
+        "feature": "type=pickup",
+        "importance": 0.011775,
+        "importance_pct": 1.18
+      },
+      {
+        "rank": 9,
+        "feature": "drive=unknown",
+        "importance": 0.010182,
+        "importance_pct": 1.02
+      },
+      {
+        "rank": 10,
+        "feature": "type=sedan",
+        "importance": 0.008482,
+        "importance_pct": 0.85
+      },
+      {
+        "rank": 11,
+        "feature": "type=truck",
+        "importance": 0.008114,
+        "importance_pct": 0.81
+      },
+      {
+        "rank": 12,
+        "feature": "type=other",
+        "importance": 0.00783,
+        "importance_pct": 0.78
+      },
+      {
+        "rank": 13,
+        "feature": "type=suv",
+        "importance": 0.007382,
+        "importance_pct": 0.74
+      },
+      {
+        "rank": 14,
+        "feature": "manufacturer=chevrolet",
+        "importance": 0.00695,
+        "importance_pct": 0.7
+      },
+      {
+        "rank": 15,
+        "feature": "transmission=automatic",
+        "importance": 0.006948,
+        "importance_pct": 0.69
+      }
+    ],
+    "xgboost": [
+      {
+        "rank": 1,
+        "feature": "fuel=diesel",
+        "importance": 0.159571,
+        "importance_pct": 15.96
+      },
+      {
+        "rank": 2,
+        "feature": "drive=fwd",
+        "importance": 0.068621,
+        "importance_pct": 6.86
+      },
+      {
+        "rank": 3,
+        "feature": "year",
+        "importance": 0.063452,
+        "importance_pct": 6.35
+      },
+      {
+        "rank": 4,
+        "feature": "transmission=other",
+        "importance": 0.041876,
+        "importance_pct": 4.19
+      },
+      {
+        "rank": 5,
+        "feature": "type=pickup",
+        "importance": 0.036116,
+        "importance_pct": 3.61
+      },
+      {
+        "rank": 6,
+        "feature": "fuel=gas",
+        "importance": 0.032143,
+        "importance_pct": 3.21
+      },
+      {
+        "rank": 7,
+        "feature": "drive=4wd",
+        "importance": 0.025966,
+        "importance_pct": 2.6
+      },
+      {
+        "rank": 8,
+        "feature": "type=truck",
+        "importance": 0.022227,
+        "importance_pct": 2.22
+      },
+      {
+        "rank": 9,
+        "feature": "manufacturer=mitsubishi",
+        "importance": 0.022158,
+        "importance_pct": 2.22
+      },
+      {
+        "rank": 10,
+        "feature": "manufacturer=kia",
+        "importance": 0.021938,
+        "importance_pct": 2.19
+      },
+      {
+        "rank": 11,
+        "feature": "manufacturer=subaru",
+        "importance": 0.020361,
+        "importance_pct": 2.04
+      },
+      {
+        "rank": 12,
+        "feature": "manufacturer=audi",
+        "importance": 0.017742,
+        "importance_pct": 1.77
+      },
+      {
+        "rank": 13,
+        "feature": "manufacturer=rover",
+        "importance": 0.01736,
+        "importance_pct": 1.74
+      },
+      {
+        "rank": 14,
+        "feature": "manufacturer=hyundai",
+        "importance": 0.016355,
+        "importance_pct": 1.64
+      },
+      {
+        "rank": 15,
+        "feature": "manufacturer=volkswagen",
+        "importance": 0.01493,
+        "importance_pct": 1.49
+      }
+    ]
+  },
+  "metadata": {
+    "manufacturers": [
+      "acura",
+      "audi",
+      "bmw",
+      "buick",
+      "cadillac",
+      "chevrolet",
+      "chrysler",
+      "dodge",
+      "ford",
+      "gmc",
+      "honda",
+      "hyundai",
+      "infiniti",
+      "jaguar",
+      "jeep",
+      "kia",
+      "lexus",
+      "lincoln",
+      "mazda",
+      "mercedes-benz",
+      "mini",
+      "mitsubishi",
+      "nissan",
+      "other",
+      "pontiac",
+      "ram",
+      "rover",
+      "subaru",
+      "toyota",
+      "volkswagen",
+      "volvo"
+    ],
+    "conditions": [
+      "excellent",
+      "fair",
+      "good",
+      "like new",
+      "new",
+      "salvage"
+    ],
+    "fuel_types": [
+      "diesel",
+      "electric",
+      "gas",
+      "hybrid",
+      "other"
+    ],
+    "transmissions": [
+      "automatic",
+      "manual",
+      "other"
+    ],
+    "drives": [
+      "4wd",
+      "fwd",
+      "rwd",
+      "unknown"
+    ],
+    "types": [
+      "bus",
+      "convertible",
+      "coupe",
+      "hatchback",
+      "mini-van",
+      "offroad",
+      "other",
+      "pickup",
+      "sedan",
+      "suv",
+      "truck",
+      "unknown",
+      "van",
+      "wagon"
+    ],
+    "states": [
+      "al",
+      "az",
+      "ca",
+      "co",
+      "ct",
+      "fl",
+      "ga",
+      "ia",
+      "id",
+      "il",
+      "in",
+      "ks",
+      "ma",
+      "md",
+      "mi",
+      "mn",
+      "mt",
+      "nc",
+      "nj",
+      "ny",
+      "oh",
+      "ok",
+      "or",
+      "other",
+      "pa",
+      "sc",
+      "tn",
+      "tx",
+      "va",
+      "wa",
+      "wi"
+    ],
+    "year_min": 1990,
+    "year_max": 2022,
+    "odometer_avg": 93405,
+    "price_min": 500.0,
+    "price_max": 150000.0,
+    "price_mean": 19314.432390453127,
+    "dataset_size": 353456,
+    "currency": "USD"
+  }
+}

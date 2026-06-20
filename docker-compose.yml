@@ -1,0 +1,63 @@
+# ── AutoEstim v3 — Docker Compose ───────────────────────────────────────────
+#
+# Lance le projet complet en une commande :
+#   docker-compose up --build
+#
+# Accès :
+#   Frontend : http://localhost:5500
+#   API      : http://localhost:8000
+#   Docs API : http://localhost:8000/docs
+#
+# Pré-requis :
+#   Les fichiers models/*.joblib et data/vehicles_clean.csv doivent exister.
+#   Si ce n'est pas le cas, lance d'abord :
+#     cd backend
+#     pip install -r requirements.txt
+#     python prepare_data.py --input vehicles.csv
+#     python train_models.py
+#   Puis reviens ici et lance docker-compose up.
+
+version: "3.9"
+
+services:
+
+  # ── Backend FastAPI ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: autoestim-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Monte les modèles et données depuis le host (évite de les reconstruire)
+      - ./backend/models:/app/models
+      - ./backend/data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ── Frontend Nginx ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: autoestim-frontend
+    ports:
+      - "5500:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+# ── Réseau interne ─────────────────────────────────────────────────────────
+networks:
+  default:
+    name: autoestim-network

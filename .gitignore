@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.db
+*.joblib
+vehicles.csv
+data/vehicles_clean.csv
+.DS_Store
+.vscode/
+.idea/

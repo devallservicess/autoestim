@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AutoEstim v3 — Used Car Price Prediction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">AE</span>
+      <span class="brand-name">AutoEstim</span>
+      <span class="brand-sub">v3 · Optuna · CV · Feature Importance</span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-view="estimate">Estimer</button>
+      <button class="tab" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="models">Modèles ML</button>
+    </nav>
+    <div class="status-pill" id="apiStatus">
+      <span class="dot"></span><span class="status-text"></span>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <!-- ============ VUE ESTIMATION ============ -->
+  <section class="view active" id="view-estimate">
+    <div class="grid-layout">
+      <div class="panel form-panel">
+        <div class="panel-head">
+          <span class="panel-eyebrow">Fiche véhicule</span>
+          <h1 class="panel-title">Ajouter une voiture</h1>
+          <p class="panel-sub">Données réelles de +350 000 annonces Craigslist USA.</p>
+        </div>
+        <form id="carForm" class="car-form">
+          <div class="field-row">
+            <div class="field"><label>Constructeur</label>
+              <select id="manufacturer" required><option value="" disabled selected>Choisir</option></select></div>
+            <div class="field"><label>Type</label>
+              <select id="type"><option value="unknown">Non précisé</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Année</label>
+              <input type="number" id="year" placeholder="2018" required /></div>
+            <div class="field"><label>Kilométrage (miles)</label>
+              <input type="number" id="odometer" placeholder="60000" min="0" required /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Carburant</label>
+              <select id="fuel" required><option value="" disabled selected>Choisir</option></select></div>
+            <div class="field"><label>Transmission</label>
+              <select id="transmission" required><option value="" disabled selected>Choisir</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>État du véhicule</label>
+              <select id="condition"><option value="good">Good</option></select></div>
+            <div class="field"><label>Traction</label>
+              <select id="drive"><option value="unknown">Non précisé</option></select></div>
+          </div>
+          <div class="field"><label>État (US)</label>
+            <select id="state"><option value="unknown">Non précisé</option></select></div>
+          <div class="field">
+            <label>Modèle de prédiction</label>
+            <div class="model-toggle" id="modelToggle">
+              <button type="button" class="model-opt active" data-model="xgboost">
+                <span class="model-opt-name">XGBoost</span>
+                <span class="model-opt-tag">recommandé · Optuna</span>
+              </button>
+              <button type="button" class="model-opt" data-model="random_forest">
+                <span class="model-opt-name">Random Forest</span>
+                <span class="model-opt-tag">Optuna</span>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span>Estimer le prix</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <p class="form-error" id="formError"></p>
+        </form>
+      </div>
+
+      <div class="panel result-panel">
+        <div class="panel-head">
+          <span class="panel-eyebrow">Estimation</span>
+          <h2 class="panel-title">Prix prédit</h2>
+        </div>
+        <div class="result-empty" id="resultEmpty">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13M5 13h14a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1z"/>
+            <circle cx="7.5" cy="18" r="0.5"/><circle cx="16.5" cy="18" r="0.5"/>
+          </svg>
+          <p>Remplis la fiche pour voir l'estimation</p>
+        </div>
+        <div class="result-content" id="resultContent" style="display:none;">
+          <div class="result-price">
+            <span class="result-currency">≈</span>
+            <span class="result-value" id="resultValue">0</span>
+            <span class="result-unit">USD</span>
+          </div>
+          <div class="result-meta" id="resultMeta"></div>
+          <div class="result-summary" id="resultSummary"></div>
+          <div class="market-context" id="marketContext"></div>
+          <div class="result-confidence">
+            <div class="confidence-row"><span>Précision du modèle (R²)</span><span id="confR2">—</span></div>
+            <div class="confidence-bar"><div class="confidence-fill" id="confFill"></div></div>
+            <div class="confidence-row small"><span>Marge d'erreur moyenne (MAE)</span><span id="confMae">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE DASHBOARD ============ -->
+  <section class="view" id="view-dashboard">
+    <div class="dash-head">
+      <div><span class="panel-eyebrow">Vue d'ensemble</span>
+        <h1 class="panel-title">Dashboard</h1></div>
+      <button class="ghost-btn" id="refreshDash">Actualiser</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-label">Estimations effectuées</span><span class="stat-value" id="statTotal">0</span></div>
+      <div class="stat-card"><span class="stat-label">Prix moyen estimé</span><span class="stat-value" id="statAvg">$0</span></div>
+      <div class="stat-card"><span class="stat-label">Constructeur le + testé</span><span class="stat-value" id="statTopBrand">—</span></div>
+    </div>
+    <div class="dash-grid">
+      <div class="panel"><h3 class="panel-title small">Prix moyen par constructeur</h3><div id="brandChart" class="bar-chart"></div></div>
+      <div class="panel"><h3 class="panel-title small">Répartition carburant</h3><div id="fuelChart" class="donut-wrap"></div></div>
+    </div>
+    <div class="panel table-panel">
+      <h3 class="panel-title small">Historique des estimations</h3>
+      <div class="table-scroll">
+        <table class="cars-table">
+          <thead><tr>
+            <th>Constructeur</th><th>Année</th><th>Miles</th><th>Carburant</th>
+            <th>Transmission</th><th>État</th><th>Modèle ML</th><th>Prix estimé</th><th></th>
+          </tr></thead>
+          <tbody id="carsTableBody">
+            <tr class="empty-row"><td colspan="9">Aucune voiture analysée.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VUE MODELES ============ -->
+  <section class="view" id="view-models">
+    <span class="panel-eyebrow">Analyse ML</span>
+    <h1 class="panel-title">Modèles & Performance</h1>
+    <p class="panel-sub">Hyperparamètres optimisés via Optuna · Évaluation par Cross-Validation 5-folds · Feature Importance extraite</p>
+
+    <div class="dataset-banner" id="datasetBanner"></div>
+
+    <!-- Cartes métriques -->
+    <div class="models-grid" id="modelsGrid"></div>
+
+    <!-- Feature Importance -->
+    <div class="panel fi-panel">
+      <div class="fi-header">
+        <div>
+          <h3 class="panel-title small">Feature Importance</h3>
+          <p class="panel-sub" style="margin-top:-8px">Quelles caractéristiques influencent le plus le prix ?</p>
+        </div>
+        <div class="fi-tabs">
+          <button class="fi-tab active" data-fi-model="xgboost">XGBoost</button>
+          <button class="fi-tab" data-fi-model="random_forest">Random Forest</button>
+        </div>
+      </div>
+      <div id="fiSection"><div class="empty-chart">Chargement…</div></div>
+    </div>
+
+    <!-- Cross-Validation -->
+    <div class="panel cv-panel">
+      <h3 class="panel-title small">Cross-Validation — 5 Folds</h3>
+      <p class="panel-sub" style="margin-top:-8px">Évaluation robuste : le dataset est découpé en 5 parties, le modèle est entraîné 5 fois et les métriques sont moyennées.</p>
+      <div id="cvSection" class="cv-grid-outer"><div class="empty-chart">Chargement…</div></div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="panel pipeline-panel">
+      <h3 class="panel-title small">Pipeline complet</h3>
+      <div class="pipeline-steps">
+        <div class="pipeline-step"><span class="pipeline-num">01</span><span class="pipeline-label">vehicles.csv</span><span class="pipeline-desc">400k+ annonces Craigslist brutes</span></div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step"><span class="pipeline-num">02</span><span class="pipeline-label">prepare_data.py</span><span class="pipeline-desc">Filtrage, NaN, uniformisation</span></div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step"><span class="pipeline-num">03</span><span class="pipeline-label">Optuna Tuning</span><span class="pipeline-desc">Recherche auto des meilleurs hyperparamètres</span></div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step"><span class="pipeline-num">04</span><span class="pipeline-label">CV 5-Folds</span><span class="pipeline-desc">Validation croisée robuste</span></div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step"><span class="pipeline-num">05</span><span class="pipeline-label">Pipeline sklearn</span><span class="pipeline-desc">Scaler + OHE + RF/XGBoost</span></div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step"><span class="pipeline-num">06</span><span class="pipeline-label">FastAPI</span><span class="pipeline-desc">Prédiction en temps réel</span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+<div class="toast" id="toast"></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

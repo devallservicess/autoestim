@@ -3,7 +3,6 @@ __pycache__/
 venv/
 .venv/
 *.db
-*.joblib
 vehicles.csv
 data/vehicles_clean.csv
 .DS_Store

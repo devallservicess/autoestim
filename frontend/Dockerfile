@@ -1,19 +1,29 @@
-# ── AutoEstim v3 — Frontend Dockerfile ─────────────────────────────────────
-# Nginx ultra-léger pour servir les fichiers statiques HTML/CSS/JS
-FROM nginx:alpine
+FROM python:3.12-slim
+LABEL maintainer="AutoEstim"
+LABEL description="Car Price Prediction API — Craigslist USA"
+LABEL version="3.0.0"
 
-# Copier les fichiers frontend dans nginx
-COPY . /usr/share/nginx/html
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
-# Configuration nginx personnalisée (gzip, cache, CORS)
-RUN echo 'server { \
-    listen 80; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    gzip on; \
-    gzip_types text/css application/javascript; \
-    location / { try_files $uri $uri/ /index.html; } \
-    location ~* \.(js|css|html)$ { expires 1h; add_header Cache-Control "public"; } \
-}' > /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-EXPOSE 80
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY . .
+
+RUN mkdir -p data models
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" || exit 1
+
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
